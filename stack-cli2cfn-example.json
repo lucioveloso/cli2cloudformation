@@ -1,0 +1,42 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "bucketInfo": {
+        "Type": "Custom::LocationConstraint",
+        "Properties": {
+          "ServiceToken": "arn:aws:lambda:eu-west-1:432811670411:function:cli2cfn_proxy2",
+          "CliCommandCreate": "s3api get-bucket-location --bucket lucio-bucket",
+	  "CreateAsDefault" : "True"
+        }
+      },
+      "vpcDefault": {-
+        "Type": "Custom::cfnCliWrapper",
+        "Properties": {
+          "ServiceToken": "arn:aws:lambda:eu-west-1:432811670411:function:cli2cfn_proxy2",
+          "CliCommandCreate": "ec2 describe-vpcs --filters 'Name=isDefault,Values=true' --query 'Vpcs[0]'",
+          "CliCommandUpdate": "ec2 describe-vpcs --filters 'Name=isDefault,Values=true' --query 'Vpcs[0]'"
+        }
+      },
+      "imageIdNameBased": {
+        "Type": "Custom::cfnCliWrapper",
+        "Properties": {
+          "ServiceToken": "arn:aws:lambda:eu-west-1:432811670411:function:cli2cfn_proxy2",
+          "CliCommandCreate": "ec2 describe-images --filters 'Name=name,Values=amzn-ami-hvm-2017.03.0.20170417-x86_64-gp2' --query 'Images[0]'"
+        }
+      }
+    },
+    "Outputs": {
+      "exampleGettingBucketLocation": {
+        "Value": { "Fn::GetAtt" : ["bucketInfo", "LocationConstraint"] },
+        "Description": "Lucio's Bucket Location"
+      },
+      "exampleGettingDefaultVpcWithWrapper": {
+        "Value": { "Fn::GetAtt" : ["vpcDefault", "VpcId"] },
+        "Description": "Default VPC"
+      },
+      "exampleGettingImageIdNameBased": {
+        "Value": { "Fn::GetAtt" : ["imageIdNameBased", "ImageId"] },
+        "Description": "Get Amazon Linux in any Region"
+      }
+    }
+}
