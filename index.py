@@ -24,7 +24,7 @@ def lambda_handler(event, context):
     if (command_request_type in properties and
         properties[command_request_type] != ""):
         try:
-            output = run_cmd("aws " + properties[command_request_type])
+            output = run_cmd("wrapper " + properties[command_request_type])
             r = null_return if output is None else json.loads(output)
             sendResponseCfn(event, context, "SUCCESS", r, "Command Executed.")
         except Exception as e:
