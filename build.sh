@@ -5,6 +5,6 @@ rm -rf $f
 mkdir $f
 pip install awscli -t $f
 pip install requests -t $f
-cp aws index.py $f
+cp wrapper index.py $f
 zip $f.zip $f
 rm -rf $f
