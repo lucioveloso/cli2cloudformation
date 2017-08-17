@@ -6,5 +6,7 @@ mkdir $f
 pip install awscli -t $f
 pip install requests -t $f
 cp wrapper index.py $f
-zip $f.zip $f
+cd $f
+zip -r ../$f.zip .
+cd ..
 rm -rf $f
