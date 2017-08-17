@@ -9,7 +9,7 @@
 	  "CreateAsDefault" : "True"
         }
       },
-      "vpcDefault": {-
+      "vpcDefault": {
         "Type": "Custom::cfnCliWrapper",
         "Properties": {
           "ServiceToken": "arn:aws:lambda:eu-west-1:432811670411:function:cli2cfn_proxy2",
