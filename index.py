@@ -24,9 +24,15 @@ def lambda_handler(event, context):
     if (command_request_type in properties and
         properties[command_request_type] != ""):
         try:
-            output = run_cmd("wrapper " + properties[command_request_type])
-            r = null_return if output is None else json.loads(output)
+            output = run_cmd("/var/task/wrapper " + properties[command_request_type])
+            if output is None:
+                print("Null return")
+                r = null_return
+            else:
+                r = json.loads(output)
             sendResponseCfn(event, context, "SUCCESS", r, "Command Executed.")
+            print("Command executed.")
+            print("Response: " + json.dumps(r))
         except Exception as e:
             print(e)
             sendResponseCfn(event, context, "FAILED", null_return, "Failed to execute the command.")
@@ -57,3 +63,4 @@ def sendResponseCfn(event, context, responseStatus, responseData, reason):
     except Exception as e:
         print(e)
         raise
+
