@@ -11,6 +11,7 @@ You can use cli2cloudformation to get all kind of information from your environm
 
 ```
 git clone https://github.com/lucioveloso/cli2cloudformation.git
+cd cli2cloudformation
 npm install -g serverless
 npm install serverless-python-requirements
 sls deploy
