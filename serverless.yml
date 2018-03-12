@@ -1,0 +1,14 @@
+service: cli2cloudformation
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: eu-west-1
+
+functions:
+  cli:
+    handler: index.lambda_handler
+
+plugins:
+  - serverless-python-requirements

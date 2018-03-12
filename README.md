@@ -10,12 +10,11 @@ You can use cli2cloudformation to get all kind of information from your environm
 ## Get Started
 
 ```
-[~/] git clone https://github.com/lucioveloso/cli2cloudformation.git
-[~/] cd cli2cloudformation
-[~/cli2cloudformation] ./build.sh # It will generate the cli2cfnLambda.zip file.
+git clone https://github.com/lucioveloso/cli2cloudformation.git
+npm install -g serverless
+npm install serverless-python-requirements
+sls deploy
 ```
-
-Now, just create a new lambda function using this zip, using runtime Python2.7. The handler should be: index.lambda_handler.
 
 After that, you're ready to enjoy the CLI in Cloudformation:
 
@@ -25,8 +24,8 @@ After that, you're ready to enjoy the CLI in Cloudformation:
 "imageIdNameBased": {
         "Type": "Custom::cli2cfnLambda",
         "Properties": {
-          "ServiceToken": "arn:aws:lambda:eu-west-1:123456789012:function:cli2cfnLambda",
-          "CliCommandCreate": "ec2 describe-images --filters 'Name=name,Values=amzn-ami-hvm-2017.03.0.20170417-x86_64-gp2' --query 'Images[0]'"
+          "ServiceToken": "arn:aws:lambda:eu-west-1:123456789012:function:cli2cloudformation-dev-cli",
+          "Create": "ec2 describe-images --filters 'Name=name,Values=amzn-ami-hvm-2017.03.0.20170417-x86_64-gp2' --query 'Images[0]'"
 	}
 }
 ```

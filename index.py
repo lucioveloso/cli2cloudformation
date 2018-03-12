@@ -1,46 +1,38 @@
 import json
 import shlex
 import subprocess
-import requests
+from botocore.vendored import requests
 
 
 def lambda_handler(event, context):
-    null_return = json.loads("{}")
-    if ('RequestType' not in event or
-        'ResourceProperties' not in event):
-        sendResponseCfn(event, context, "FAILED", null_return, "Cannot identify RequestType or ResourceProperties." )
+
+    if 'RequestType' not in event or 'ResourceProperties' not in event:
+        send_cfn_response(event, context, "FAILED", {}, "Cannot identify RequestType or ResourceProperties.")
         return
 
     properties = event['ResourceProperties']
-    command_request_type = "CliCommand" + event['RequestType']
 
-    # Use action create as default if not action update or delete is specified.
-    if("CreateAsDefault" in properties and
-        properties["CreateAsDefault"] == "True" and
-            (command_request_type not in properties or
-             properties[command_request_type] == "")):
-        command_request_type = "CliCommandCreate"
+    if "CreateAsDefault" in properties and properties["CreateAsDefault"] == "True":
+        command_request_type = "Create"  # Ignore cfn RequestType
+    else:
+        command_request_type = event['RequestType']
 
-    if (command_request_type in properties and
-        properties[command_request_type] != ""):
+    if command_request_type in properties and properties[command_request_type] != "":
         try:
-            print(properties[command_request_type])
             output = run_cmd("/var/task/wrapper " + properties[command_request_type])
+
             if output is None or output == "":
-                print("Null return")
-                r = null_return
+                r = {}
             else:
-                print(output)
                 r = json.loads(output)
-            sendResponseCfn(event, context, "SUCCESS", r, "Command Executed.")
-            print("Command executed.")
+
+            send_cfn_response(event, context, "SUCCESS", r, "Command Executed.")
+
         except Exception as e:
             print(e)
-            sendResponseCfn(event, context, "FAILED", null_return, "Failed to execute the command.")
+            send_cfn_response(event, context, "FAILED", {}, "Failed to execute the command.")
     else:
-        sendResponseCfn(event, context, "SUCCESS", null_return, command_request_type + " has no action.")
-
-    return True
+        send_cfn_response(event, context, "SUCCESS", {}, command_request_type + " has no action.")
 
 
 def run_cmd(command):
@@ -50,14 +42,14 @@ def run_cmd(command):
     return output
 
 
-def sendResponseCfn(event, context, responseStatus, responseData, reason):
-    response_body = {'Status': responseStatus,
+def send_cfn_response(event, context, response_status, response_data, reason):
+    response_body = {'Status': response_status,
                     'Reason': 'Log stream name: ' + context.log_stream_name,
                     'PhysicalResourceId': context.log_stream_name,
                     'StackId': event['StackId'],
                     'RequestId': event['RequestId'],
                     'LogicalResourceId': event['LogicalResourceId'],
-                    'Data': responseData}
+                    'Data': response_data}
     print("Log Reason: " + reason)
     try:
         requests.put(event['ResponseURL'], data=json.dumps(response_body))
